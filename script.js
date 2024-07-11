@@ -4,6 +4,8 @@ const board = document.getElementById('game-board');
 const boardLength = 20;
 const instructionText = document.getElementById('instruction-text');
 const logo = document.getElementById('logo')
+const score = document.getElementById('score')
+const highScore = document.getElementById('highScore')
 
 let snake = [{x:10, y:10}];
 let food = generateFood();
@@ -16,6 +18,7 @@ function draw() {
     board.innerHTML = '';
     drawSnake();
     drawFood();
+    updateScore();
 }
 
 function drawSnake() {
@@ -38,9 +41,11 @@ function setPosition(element, position) {
 }
 
 function drawFood() {
-    const foodElement = createGameElement('div', 'food');
-    setPosition(foodElement, food);
-    board.appendChild(foodElement);
+    if(gameStarted) {
+        const foodElement = createGameElement('div', 'food');
+        setPosition(foodElement, food);
+        board.appendChild(foodElement);
+    }
 }
 
 function generateFood() {
@@ -73,7 +78,7 @@ function move(){
         clearInterval(gameInterval);
         gameInterval = setInterval(() => {
             move()
-            // checkCollision()
+            checkCollision()
             draw()
         }, gameSpeedDelay);
     } else {
@@ -87,7 +92,7 @@ function startGame(){
     logo.style.display = 'none';
     gameInterval = setInterval(() => {
         move()
-        // checkCollision()
+        checkCollision()
         draw()
     }, gameSpeedDelay);
 }
@@ -127,6 +132,46 @@ function increaseSpeed() {
         gameSpeedDelay -= 2;
     } else if(gameSpeedDelay >= 20) {
         gameSpeedDelay -= 1;
+    }
+}
+
+function checkCollision(){
+    const head = snake[0];
+    if(head.x < 1 || head.x > boardLength || head.y < 1 || head.y > boardLength){
+        endGame();
+    }
+
+    for(let i = 1; i < snake.length;i++){
+        if(head.x === snake[i].x && head.y === snake[i].y){
+            endGame();
+        }
+    }
+}
+
+function endGame(){
+    updateHighScore();
+    clearInterval(gameInterval);
+    gameStarted = false;
+    board.innerHTML = '';
+    snake = [{x:10, y:10}];
+    food = generateFood();
+    direction = "right";
+    gameSpeedDelay = 200;
+    logo.style.display = 'block';
+    instructionText.style.display = 'block';
+    updateScore()
+}
+
+function updateScore(){
+    const currentScore = snake.length - 1;
+    score.textContent = currentScore.toString().padStart(3, '0');
+}
+
+function updateHighScore() {
+    const currentScore = snake.length - 1;
+    if(currentScore > parseInt(highScore.textContent)){
+        highScore.textContent = currentScore.toString().padStart(3, '0');
+        highScore.style.display = 'block';
     }
 }
 
