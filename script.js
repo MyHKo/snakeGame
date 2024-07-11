@@ -49,8 +49,12 @@ function drawFood() {
 }
 
 function generateFood() {
-    const x = Math.floor(Math.random() * boardLength) + 1;
-    const y = Math.floor(Math.random() * boardLength) + 1;
+    let x;
+    let y;
+    do {
+         x = Math.floor(Math.random() * boardLength) + 1;
+         y = Math.floor(Math.random() * boardLength) + 1;
+    } while (isSnake(x, y))
     return {x,y};
 }
 
@@ -141,11 +145,17 @@ function checkCollision(){
         endGame();
     }
 
+    if(isSnake(head.x, head.y))
+        endGame();
+}
+
+function isSnake(x, y) {
     for(let i = 1; i < snake.length;i++){
-        if(head.x === snake[i].x && head.y === snake[i].y){
-            endGame();
+        if(x === snake[i].x && y === snake[i].y){
+            return true
         }
     }
+    return false;
 }
 
 function endGame(){
